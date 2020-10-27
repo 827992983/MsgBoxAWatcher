@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <ExecutablePath>D:\WinDDK\7600.16385.1\bin\x86;$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IncludePath>D:\WinDDK\7600.16385.1\inc\api;D:\WinDDK\7600.16385.1\inc\ddk;D:\WinDDK\7600.16385.1\inc\crt;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LibraryPath>D:\WinDDK\7600.16385.1\lib\wxp\i386;$(LibraryPath)</LibraryPath>
+    <TargetExt>.sys</TargetExt>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_X86_;DBG</PreprocessorDefinitions>
+      <CallingConvention>StdCall</CallingConvention>
+      <ExceptionHandling>false</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CompileAs>Default</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AssemblerOutput>All</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ntoskrnl.lib;wdm.lib;wdmsec.lib;wmilib.lib;ndis.lib;Hal.lib;MSVCRT.LIB;LIBCMT.LIB;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <EnableUAC>false</EnableUAC>
+      <SubSystem>Native</SubSystem>
+      <EntryPointSymbol>DriverEntry</EntryPointSymbol>
+      <BaseAddress>0x10000</BaseAddress>
+      <RandomizedBaseAddress>
+      </RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Driver>Driver</Driver>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
