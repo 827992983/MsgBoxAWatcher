@@ -14,4 +14,4 @@ vs2010 + wdk7600
 Windows XP 32位
 
 ## 项目说明
-https://blog.csdn.net/Kwansy
+https://blog.csdn.net/Kwansy/article/details/109313237
