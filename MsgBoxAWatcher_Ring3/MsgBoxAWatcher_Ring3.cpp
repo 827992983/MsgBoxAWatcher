@@ -5,10 +5,6 @@
 //3、写HOOK
 //4、shellcode
 
-// C/C++ -> 代码生成
-// 基本运行时检查：默认值
-// 缓冲区安全检查：否
-
 
 #include "stdafx.h"
 #include <Windows.h>
@@ -276,12 +272,6 @@ void BypassApiWriteCopy()
 // 理论上可以 HOOK User32.dll 里的任意函数
 BOOL HookUser32Api()
 {
-	// 遍历USER32.DLL函数
-	// 构造一个中断门，返回中断号（如0x20）,通过该中断门可跳转监视函数
-	// 只要函数开头是 0x8BFF 的函数，都改成中断门调用（例如中断号是0x20，就将头两字节改成 0xCD20）
-	// 监视函数：在3环申请一块共享内存，将shellcode拷贝进去，设置为可执行。
-	// 监视函数的功能是记录函数调用并打印参数
-
 	HANDLE hDevice = CreateFileW(DRIVER_LINK,GENERIC_READ|GENERIC_WRITE,0,0,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
 	if (hDevice == INVALID_HANDLE_VALUE)
 	{
@@ -320,7 +310,7 @@ void UpdateApiCallRecord()
 	DWORD dwRetBytes; // 返回的字节数
 	while (!GetAsyncKeyState('Q'))
 	{
-		Sleep(200);
+		Sleep(50);
 		DeviceIoControl(hDevice,OPER_GET_APICALLRECORD,NULL,0,&ApiCallRecord,sizeof(ApiCallRecord),&dwRetBytes,NULL);
 		if (dwRetBytes == 0) 
 		{
@@ -331,10 +321,8 @@ void UpdateApiCallRecord()
 		{
 			printf("MessageBoxA(%x, %x, %x, %x);\n", \
 				ApiCallRecord.Param[0],ApiCallRecord.Param[1],ApiCallRecord.Param[2],ApiCallRecord.Param[3]);
-		}		
+		}
 	}
-
-
 	CloseHandle(hDevice);
 }
 

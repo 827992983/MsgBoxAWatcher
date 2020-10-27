@@ -1,7 +1,3 @@
-// C/C++ -> 代码生成
-// 基本运行时检查：默认值
-// 缓冲区安全检查：否
-
 #include <ntifs.h>
 #include <wdm.h>
 
@@ -42,7 +38,7 @@ typedef struct _LDR_DATA_TABLE_ENTRY
 	PVOID PatchInformation;
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
 
-// API调用记录父类
+// API调用记录
 typedef struct _APICALLRECORD
 {
 	LIST_ENTRY ApiCallRecordList; // 链表
@@ -61,8 +57,6 @@ VOID DriverUnload(PDRIVER_OBJECT pDriver);
 NTSTATUS IrpCreateProc(PDEVICE_OBJECT pDevObj, PIRP pIrp);
 NTSTATUS IrpCloseProc(PDEVICE_OBJECT pDevObj, PIRP pIrp);
 NTSTATUS IrpDeviceControlProc(PDEVICE_OBJECT pDevObj, PIRP pIrp);
-VOID GetKernelBase(PDRIVER_OBJECT driver, PVOID *pKrnlBase, PUINT32 uKrnlImageSize);
-PVOID MemorySearch(PVOID bytecode, UINT32 bytecodeLen, PVOID pBeginAddress, PVOID pEndAddress);
 UINT32 *GetPDE(UINT32 addr);
 UINT32 *GetPTE(UINT32 addr);
 USHORT SetCallGate(UINT32 pFunction, UINT32 nParam);
@@ -233,46 +227,6 @@ NTSTATUS IrpDeviceControlProc(PDEVICE_OBJECT pDevObj, PIRP pIrp)
 	pIrp->IoStatus.Status = status;
 	IoCompleteRequest(pIrp, IO_NO_INCREMENT);
 	return STATUS_SUCCESS;
-}
-
-// 获取内核基址，大小
-VOID GetKernelBase(PDRIVER_OBJECT driver, PVOID *pKrnlBase, PUINT32 uKrnlImageSize)
-{
-	PLDR_DATA_TABLE_ENTRY pLdteHead; // 内核模块链表头
-	PLDR_DATA_TABLE_ENTRY pLdteCur; // 遍历指针
-	UNICODE_STRING usKrnlBaseDllName; // 内核模块名
-
-	RtlInitUnicodeString(&usKrnlBaseDllName,L"ntoskrnl.exe");
-	pLdteHead = (PLDR_DATA_TABLE_ENTRY)driver->DriverSection;
-	pLdteCur = pLdteHead;
-	do 
-	{
-		PLDR_DATA_TABLE_ENTRY pLdte = CONTAINING_RECORD(pLdteCur, LDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
-		//DbgPrint("DllBase: %p, SizeOfImage: %08X %wZ\n", pLdteCur->DllBase, pLdteCur->SizeOfImage, &(pLdteCur->FullDllName));
-		if (RtlCompareUnicodeString(&pLdteCur->BaseDllName, &usKrnlBaseDllName, TRUE) == 0)
-		{
-			*pKrnlBase = pLdteCur->DllBase;
-			*uKrnlImageSize = pLdteCur->SizeOfImage;
-			return;
-		}
-		pLdteCur = (PLDR_DATA_TABLE_ENTRY)pLdteCur->InLoadOrderLinks.Flink;
-	} while (pLdteHead != pLdteCur);
-	return;
-}
-
-// 特征码搜索
-PVOID MemorySearch(PVOID bytecode, UINT32 bytecodeLen, PVOID pBeginAddress, PVOID pEndAddress)
-{
-	PVOID pCur = pBeginAddress;
-	while (pCur != pEndAddress)
-	{
-		if (RtlCompareMemory(bytecode,pCur,bytecodeLen) == bytecodeLen)
-		{
-			return pCur;
-		}
-		((UINT32)pCur)++;
-	}
-	return 0;
 }
 
 // 构造提权中断门，返回中断号
@@ -484,3 +438,5 @@ void FreeApiCallQueue(IN PAPICALLRECORD QueueHead)
 		ExFreePool(pApiCallRecord);
 	}
 }
+
+
